@@ -31,7 +31,6 @@
     * { font-family: 'Inter', sans-serif; }
     body { background: #050505; }
 
-    /* PERBAIKAN: Menyelesaikan animasi grainNoise */
     @keyframes grainNoise {
       0% { transform: translate(0, 0); }
       10% { transform: translate(-5%, -5%); }
@@ -46,7 +45,6 @@
       100% { transform: translate(5%, 0); }
     }
 
-    /* TAMBAHAN: Efek Glitch untuk Heading */
     @keyframes glitch {
       0% { transform: translate(0) }
       20% { transform: translate(-2px, 2px) }
@@ -56,11 +54,14 @@
       100% { transform: translate(0) }
     }
 
-    .glitch-hover:hover {
-      animation: glitch 0.3s cubic-bezier(.25,.46,.45,.94) infinite;
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
     }
 
-    /* TAMBAHAN: Scanline retro */
+    .glitch-hover:hover { animation: glitch 0.3s cubic-bezier(.25,.46,.45,.94) infinite; }
+    .cursor-blink::after { content: "▋"; animation: blink 1s step-end infinite; color: #3b82f6; margin-left: 2px;}
+
     .scanline::after {
       content: "";
       position: absolute;
@@ -72,18 +73,19 @@
       z-index: 2;
     }
 
-    /* scrollbar */
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: #050505; }
     ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 3px; }
+    
+    html { scroll-behavior: smooth; }
+    
+    input:focus, textarea:focus { outline: none; }
   </style>
 </head>
 <body class="text-text-main min-h-screen relative overflow-x-hidden">
 
-  <!-- Background Grain Noise -->
+  <!-- Background FX -->
   <div class="fixed inset-0 z-50 pointer-events-none opacity-20" style="background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 256 256%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noise%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noise)%22/%3E%3C/svg%3E'); animation: grainNoise 0.2s steps(1) infinite;"></div>
-
-  <!-- Background Gradients -->
   <div class="fixed top-0 left-0 w-96 h-96 bg-blue-600/10 rounded-full blur-[120px] animate-pulse"></div>
   <div class="fixed bottom-0 right-0 w-96 h-96 bg-purple-600/5 rounded-full blur-[120px] animate-pulse" style="animation-delay: 1s;"></div>
 
@@ -93,12 +95,10 @@
       BLACK<span class="text-accent">HAT</span>
     </a>
     <div class="hidden md:flex items-center gap-8">
-      <a href="#" class="text-sm font-medium text-text-sub hover:text-white transition-colors duration-150 tracking-wide uppercase">Blog</a>
-      <a href="#" class="text-sm font-medium text-text-sub hover:text-white transition-colors duration-150 tracking-wide uppercase">Tools</a>
-      <a href="#" class="text-sm font-medium text-text-sub hover:text-white transition-colors duration-150 tracking-wide uppercase">About</a>
-      <button class="px-4 py-2 bg-white text-black text-xs font-bold uppercase tracking-widest rounded-sm hover:bg-neutral-200 transition-colors">
-        Login
-      </button>
+      <a href="#about" class="text-sm font-medium text-text-sub hover:text-white transition-colors duration-150 tracking-wide uppercase">About</a>
+      <a href="#articles" class="text-sm font-medium text-text-sub hover:text-white transition-colors duration-150 tracking-wide uppercase">Blog</a>
+      <a href="#tools" class="text-sm font-medium text-text-sub hover:text-white transition-colors duration-150 tracking-wide uppercase">Arsenal</a>
+      <a href="#contact" class="text-sm font-medium text-text-sub hover:text-white transition-colors duration-150 tracking-wide uppercase">Contact</a>
     </div>
     <button class="md:hidden text-white" id="menu-toggle">
       <i data-lucide="menu" class="w-6 h-6"></i>
@@ -107,9 +107,10 @@
 
   <!-- Mobile Menu -->
   <div id="mobile-menu" class="fixed inset-0 bg-primary z-30 flex flex-col items-center justify-center gap-8 hidden">
-    <a href="#" class="text-2xl font-medium tracking-tight text-text-sub hover:text-white transition-colors">Blog</a>
-    <a href="#" class="text-2xl font-medium tracking-tight text-text-sub hover:text-white transition-colors">Tools</a>
-    <a href="#" class="text-2xl font-medium tracking-tight text-text-sub hover:text-white transition-colors">About</a>
+    <a href="#about" class="text-2xl font-medium tracking-tight text-text-sub hover:text-white transition-colors mobile-link">About</a>
+    <a href="#articles" class="text-2xl font-medium tracking-tight text-text-sub hover:text-white transition-colors mobile-link">Blog</a>
+    <a href="#tools" class="text-2xl font-medium tracking-tight text-text-sub hover:text-white transition-colors mobile-link">Arsenal</a>
+    <a href="#contact" class="text-2xl font-medium tracking-tight text-text-sub hover:text-white transition-colors mobile-link">Contact</a>
   </div>
 
   <!-- Hero Section -->
@@ -125,127 +126,588 @@
       </p>
       <div class="flex items-center gap-4">
         <a href="#articles" class="px-6 py-3 bg-white text-black text-xs font-bold uppercase tracking-widest rounded-sm hover:bg-neutral-200 transition-colors flex items-center gap-2">
-          Baca Artikel
+          Akses Log
           <i data-lucide="arrow-down" class="w-4 h-4"></i>
         </a>
-        <div class="w-2 h-2 bg-green-500 rounded-full animate-ping"></div>
-        <span class="text-xs font-mono text-green-500">ONLINE</span>
+        <div class="flex items-center gap-2 cursor-pointer" id="secret-trigger">
+          <div class="w-2 h-2 bg-green-500 rounded-full animate-ping"></div>
+          <span class="text-xs font-mono text-green-500">ONLINE</span>
+        </div>
+      </div>
+      <!-- Easter Egg Secret Panel -->
+      <div id="secret-panel" class="mt-8 p-4 border border-green-500/30 bg-green-500/5 rounded-sm max-w-md hidden font-mono text-sm text-green-400">
+        <p class="text-xs text-green-600 mb-2">// ACCESS GRANTED</p>
+        <p>Admin Mode: Active. Selamat datang di area tersembunyi.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section id="about" class="px-6 md:px-12 py-24 border-t border-border-sub">
+    <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-12">
+      <div class="md:col-span-5 border border-border-sub rounded-sm bg-panel/50 p-6 font-mono text-sm">
+        <div class="flex items-center gap-2 mb-4 border-b border-border-sub pb-4">
+          <div class="w-3 h-3 rounded-full bg-red-500/80"></div>
+          <div class="w-3 h-3 rounded-full bg-yellow-500/80"></div>
+          <div class="w-3 h-3 rounded-full bg-green-500/80"></div>
+          <span class="ml-2 text-text-dim text-xs">kenzo@blackhat:~</span>
+        </div>
+        <div class="space-y-2 text-text-sub">
+          <p><span class="text-green-400">kenzo@blackhat</span>:<span class="text-blue-400">~</span>$ whoami</p>
+          <p class="text-white pl-4">Security Enthusiast & Bug Hunter</p>
+          <p><span class="text-green-400">kenzo@blackhat</span>:<span class="text-blue-400">~</span>$ cat /etc/motd</p>
+          <p class="text-white pl-4">"Knowledge belongs to the world."</p>
+          <p><span class="text-green-400">kenzo@blackhat</span>:<span class="text-blue-400">~</span>$ echo $STATUS</p>
+          <p class="text-white pl-4">Learning, Breaking, Building, Securing.<span class="cursor-blink"></span></p>
+        </div>
+      </div>
+
+      <div class="md:col-span-7 flex flex-col justify-center">
+        <p class="text-xs font-medium tracking-widest uppercase text-text-dim mb-2">// Profile</p>
+        <h2 class="text-3xl md:text-4xl font-medium tracking-tight mb-6">Tentang Saya</h2>
+        <p class="text-base text-text-sub leading-relaxed mb-4">
+          Nama saya <span class="text-white font-medium">Kenzo Dista Ananta</span>. Saya adalah seorang <em>Security Enthusiast</em> yang secara aktif mendalami dunia keamanan siber. Perjalanan saya dimulai dari rasa penasaran tentang bagaimana sebuah sistem bisa diretas, yang kemudian berkembang menjadi dedikasi untuk melindungi sistem tersebut.
+        </p>
+        <p class="text-base text-text-sub leading-relaxed mb-6">
+          Saya percaya bahwa satu-satunya cara untuk membangun pertahanan yang kuat adalah dengan memahami serangan secara mendalam (Offensive Security). Fokus utama saya ada pada <span class="text-accent-light">Web Application Penetration Testing</span>, <span class="text-accent-light">Reverse Engineering</span>, dan <span class="text-accent-light">Bug Hunting</span>.
+        </p>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="border border-border-sub p-4 rounded-sm">
+            <p class="text-2xl font-medium text-accent-light">3+</p>
+            <p class="text-xs text-text-dim uppercase tracking-wider mt-1">Tahun Belajar</p>
+          </div>
+          <div class="border border-border-sub p-4 rounded-sm">
+            <p class="text-2xl font-medium text-accent-light">100+</p>
+            <p class="text-xs text-text-dim uppercase tracking-wider mt-1">Lab Hours</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Ethics Warning Section -->
+  <section id="ethics" class="px-6 md:px-12 py-16 border-t border-border-sub bg-red-500/5">
+    <div class="max-w-7xl mx-auto text-center">
+      <div class="inline-flex items-center gap-2 px-3 py-1 bg-red-500/10 border border-red-500/30 rounded-full mb-6">
+        <i data-lucide="shield-alert" class="w-4 h-4 text-red-400"></i>
+        <span class="text-xs font-mono font-bold tracking-widest text-red-400 uppercase">Disclaimer Etis</span>
+      </div>
+      <h2 class="text-2xl md:text-3xl font-medium tracking-tight mb-4 text-white">White Hat Mindset</h2>
+      <p class="text-base text-text-sub leading-relaxed max-w-2xl mx-auto">
+        Semua teknik, metode, dan kode yang dibagikan di blog ini <strong class="text-white">100% bertujuan untuk edukasi</strong>. Saya tidak bertanggung jawab atas penyalahgunaan informasi yang ada. Selalu lakukan uji penetrasi pada sistem yang Anda miliki izin eksplisit (Bug Bounty, Authorized Pentest). 
+        <span class="text-red-400 font-medium">Hack with ethics.</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- Arsenal / Tools Section -->
+  <section id="tools" class="px-6 md:px-12 py-24 border-t border-border-sub">
+    <div class="max-w-7xl mx-auto">
+      <div class="mb-12 border-b border-border-sub pb-4">
+        <p class="text-xs font-medium tracking-widest uppercase text-text-dim mb-2">// Default Tools</p>
+        <h2 class="text-3xl md:text-4xl font-medium tracking-tight">Arsenal</h2>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="border border-border-sub p-4 rounded-sm hover:border-white/30 transition-all duration-300 flex flex-col items-center text-center gap-2 bg-panel/50">
+          <i data-lucide="search" class="w-6 h-6 text-blue-400"></i>
+          <span class="text-sm font-medium">Nmap</span>
+          <span class="text-xs text-text-dim">Reconnaissance</span>
+        </div>
+        <div class="border border-border-sub p-4 rounded-sm hover:border-white/30 transition-all duration-300 flex flex-col items-center text-center gap-2 bg-panel/50">
+          <i data-lucide="bug" class="w-6 h-6 text-red-400"></i>
+          <span class="text-sm font-medium">Metasploit</span>
+          <span class="text-xs text-text-dim">Exploitation</span>
+        </div>
+        <div class="border border-border-sub p-4 rounded-sm hover:border-white/30 transition-all duration-300 flex flex-col items-center text-center gap-2 bg-panel/50">
+          <i data-lucide="globe" class="w-6 h-6 text-green-400"></i>
+          <span class="text-sm font-medium">Burp Suite</span>
+          <span class="text-xs text-text-dim">Web Pentest</span>
+        </div>
+        <div class="border border-border-sub p-4 rounded-sm hover:border-white/30 transition-all duration-300 flex flex-col items-center text-center gap-2 bg-panel/50">
+          <i data-lucide="terminal" class="w-6 h-6 text-purple-400"></i>
+          <span class="text-sm font-medium">Ghidra</span>
+          <span class="text-xs text-text-dim">Reverse Eng</span>
+        </div>
       </div>
     </div>
   </section>
 
   <!-- Articles Section -->
-  <section id="articles" class="px-6 md:px-12 py-24">
+  <section id="articles" class="px-6 md:px-12 py-24 border-t border-border-sub">
     <div class="max-w-7xl mx-auto">
       <div class="flex justify-between items-end mb-12 border-b border-border-sub pb-4">
         <div>
-          <p class="text-xs font-medium tracking-widest uppercase text-text-dim mb-2">// Recent Logs</p>
-          <h2 class="text-3xl md:text-4xl font-medium tracking-tight">Artikel Terbaru</h2>
+          <p class="text-xs font-medium tracking-widest uppercase text-text-dim mb-2">// Database Logs</p>
+          <h2 class="text-3xl md:text-4xl font-medium tracking-tight">Artikel & Teknik</h2>
         </div>
-        <a href="#" class="text-sm text-text-sub hover:text-white transition-colors flex items-center gap-1">
-          Semua Artikel <i data-lucide="arrow-right" class="w-4 h-4"></i>
-        </a>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <!-- Card 1 -->
+        
+        <!-- Artikel 1 -->
         <article class="group border border-border-sub rounded-sm overflow-hidden hover:border-white/30 transition-all duration-300 bg-panel/50">
           <div class="relative overflow-hidden aspect-video">
-            <img src="https://picsum.photos/seed/hacking-terminal/800/450.jpg" alt="SQL Injection" class="object-cover w-full h-full opacity-80 group-hover:scale-105 group-hover:opacity-100 transition-all duration-500">
+            <img src="https://picsum.photos/seed/sql-injection-db/800/450.jpg" alt="SQL Injection" class="object-cover w-full h-full opacity-80 group-hover:scale-105 group-hover:opacity-100 transition-all duration-500">
             <div class="absolute top-4 left-4 px-2 py-1 bg-red-500/20 border border-red-500/30 rounded-sm">
               <span class="text-[10px] font-mono font-bold tracking-widest text-red-400 uppercase">Critical</span>
             </div>
           </div>
           <div class="p-6">
             <div class="flex items-center gap-3 text-xs text-text-dim mb-3 font-mono">
-              <span>2024.10.24</span>
-              <span>•</span>
-              <span>WEB APP</span>
+              <span>2024.10.24</span><span>•</span><span>WEB APP</span>
             </div>
             <h3 class="text-xl font-medium tracking-tight mb-2 group-hover:text-accent-light transition-colors">Analisis Depth: SQL Injection pada Framework Modern</h3>
-            <p class="text-sm text-text-sub leading-relaxed">Bagaimana ORM bisa bypass dan teknik kedua untuk mengeksploitasi celah pada sistem yang dianggap aman.</p>
+            <p class="text-sm text-text-sub leading-relaxed">Bagaimana ORM bisa di-bypass dan teknik lanjutan untuk mengeksploitasi celah pada sistem yang dianggap aman.</p>
           </div>
         </article>
 
-        <!-- Card 2 -->
+        <!-- Artikel 2 -->
         <article class="group border border-border-sub rounded-sm overflow-hidden hover:border-white/30 transition-all duration-300 bg-panel/50">
           <div class="relative overflow-hidden aspect-video">
-            <img src="https://picsum.photos/seed/dark-network/800/450.jpg" alt="Network" class="object-cover w-full h-full opacity-80 group-hover:scale-105 group-hover:opacity-100 transition-all duration-500">
+            <img src="https://picsum.photos/seed/mitm-wifi-net/800/450.jpg" alt="Network" class="object-cover w-full h-full opacity-80 group-hover:scale-105 group-hover:opacity-100 transition-all duration-500">
             <div class="absolute top-4 left-4 px-2 py-1 bg-blue-500/20 border border-blue-500/30 rounded-sm">
               <span class="text-[10px] font-mono font-bold tracking-widest text-blue-400 uppercase">Tutorial</span>
             </div>
           </div>
           <div class="p-6">
             <div class="flex items-center gap-3 text-xs text-text-dim mb-3 font-mono">
-              <span>2024.10.18</span>
-              <span>•</span>
-              <span>NETWORK</span>
+              <span>2024.10.18</span><span>•</span><span>NETWORK</span>
             </div>
             <h3 class="text-xl font-medium tracking-tight mb-2 group-hover:text-accent-light transition-colors">Man in the Middle (MITM) Attack di Jaringan WiFi Publik</h3>
-            <p class="text-sm text-text-sub leading-relaxed">Studi kasus nyata dan demonstrasi bagaimana data bisa diintercept tanpa sepengetahuan korban.</p>
+            <p class="text-sm text-text-sub leading-relaxed">Studi kasus nyata dan demonstrasi bagaimana data bisa di-intercept tanpa sepengetahuan korban.</p>
           </div>
         </article>
 
-        <!-- Card 3 -->
+        <!-- Artikel 3 -->
         <article class="group border border-border-sub rounded-sm overflow-hidden hover:border-white/30 transition-all duration-300 bg-panel/50">
           <div class="relative overflow-hidden aspect-video">
-            <img src="https://picsum.photos/seed/malware-code/800/450.jpg" alt="Malware" class="object-cover w-full h-full opacity-80 group-hover:scale-105 group-hover:opacity-100 transition-all duration-500">
+            <img src="https://picsum.photos/seed/malware-reverse/800/450.jpg" alt="Malware" class="object-cover w-full h-full opacity-80 group-hover:scale-105 group-hover:opacity-100 transition-all duration-500">
             <div class="absolute top-4 left-4 px-2 py-1 bg-yellow-500/20 border border-yellow-500/30 rounded-sm">
               <span class="text-[10px] font-mono font-bold tracking-widest text-yellow-400 uppercase">Reverse Eng</span>
             </div>
           </div>
           <div class="p-6">
             <div class="flex items-center gap-3 text-xs text-text-dim mb-3 font-mono">
-              <span>2024.10.05</span>
-              <span>•</span>
-              <span>MALWARE</span>
+              <span>2024.10.05</span><span>•</span><span>MALWARE</span>
             </div>
             <h3 class="text-xl font-medium tracking-tight mb-2 group-hover:text-accent-light transition-colors">Unpacking Malware .NET menggunakan dnSpy</h3>
             <p class="text-sm text-text-sub leading-relaxed">Langkah demi langkah melakukan dekompilasi dan analisis logika malware berbasis .NET framework.</p>
           </div>
         </article>
 
-        <!-- Card 4 -->
+        <!-- Artikel 4 -->
         <article class="group border border-border-sub rounded-sm overflow-hidden hover:border-white/30 transition-all duration-300 bg-panel/50">
           <div class="relative overflow-hidden aspect-video">
-            <img src="https://picsum.photos/seed/linux-server/800/450.jpg" alt="Privilege Escalation" class="object-cover w-full h-full opacity-80 group-hover:scale-105 group-hover:opacity-100 transition-all duration-500">
+            <img src="https://picsum.photos/seed/linux-privesc-root/800/450.jpg" alt="Privilege Escalation" class="object-cover w-full h-full opacity-80 group-hover:scale-105 group-hover:opacity-100 transition-all duration-500">
             <div class="absolute top-4 left-4 px-2 py-1 bg-purple-500/20 border border-purple-500/30 rounded-sm">
               <span class="text-[10px] font-mono font-bold tracking-widest text-purple-400 uppercase">Linux</span>
             </div>
           </div>
           <div class="p-6">
             <div class="flex items-center gap-3 text-xs text-text-dim mb-3 font-mono">
-              <span>2024.09.28</span>
-              <span>•</span>
-              <span>PRIVESC</span>
+              <span>2024.09.28</span><span>•</span><span>PRIVESC</span>
             </div>
-            <h3 class="text-xl font-medium tracking-tight mb-2 group-hover:text-accent-light transition-colors">Linux Privilege Escalation: SUID Binaries Exploit</h3>
-            <p class="text-sm text-text-sub leading-relaxed">Mengidentifikasi misconfiguration dan mengeksploitasi binary SUID untuk mendapatkan akses root.</p>
+            <h3 class="text-xl font-medium tracking-tight mb-2 group-hover:text-accent-light transition-colors">Linux Privilege Escalation: SUID & Sudo Misconfiguration</h3>
+            <p class="text-sm text-text-sub leading-relaxed">Mengidentifikasi kesalahan konfigurasi dan mengeksploitasi binary SUID untuk mendapatkan akses root.</p>
           </div>
         </article>
+
+        <!-- Artikel 5 -->
+        <article class="group border border-border-sub rounded-sm overflow-hidden hover:border-white/30 transition-all duration-300 bg-panel/50">
+          <div class="relative overflow-hidden aspect-video">
+            <img src="https://picsum.photos/seed/bug-bounty-hacker/800/450.jpg" alt="Bug Bounty" class="object-cover w-full h-full opacity-80 group-hover:scale-105 group-hover:opacity-100 transition-all duration-500">
+            <div class="absolute top-4 left-4 px-2 py-1 bg-green-500/20 border border-green-500/30 rounded-sm">
+              <span class="text-[10px] font-mono font-bold tracking-widest text-green-400 uppercase">Bug Bounty</span>
+            </div>
+          </div>
+          <div class="p-6">
+            <div class="flex items-center gap-3 text-xs text-text-dim mb-3 font-mono">
+              <span>2024.09.15</span><span>•</span><span>METHODOLOGY</span>
+            </div>
+            <h3 class="text-xl font-medium tracking-tight mb-2 group-hover:text-accent-light transition-colors">Reconnaissance Masterclass: Mendeteksi Subdomain Tersembunyi</h3>
+            <p class="text-sm text-text-sub leading-relaxed">Fase pengintaian (Recon) adalah kunci sukses Bug Bounty. Menggunakan tools seperti Subfinder, Amass, dan HTTPX.</p>
+          </div>
+        </article>
+
+        <!-- Artikel 6 -->
+        <article class="group border border-border-sub rounded-sm overflow-hidden hover:border-white/30 transition-all duration-300 bg-panel/50">
+          <div class="relative overflow-hidden aspect-video">
+            <img src="https://picsum.photos/seed/xss-cross-site/800/450.jpg" alt="XSS" class="object-cover w-full h-full opacity-80 group-hover:scale-105 group-hover:opacity-100 transition-all duration-500">
+            <div class="absolute top-4 left-4 px-2 py-1 bg-red-500/20 border border-red-500/30 rounded-sm">
+              <span class="text-[10px] font-mono font-bold tracking-widest text-red-400 uppercase">Client Side</span>
+            </div>
+          </div>
+          <div class="p-6">
+            <div class="flex items-center gap-3 text-xs text-text-dim mb-3 font-mono">
+              <span>2024.09.02</span><span>•</span><span>WEB APP</span>
+            </div>
+            <h3 class="text-xl font-medium tracking-tight mb-2 group-hover:text-accent-light transition-colors">Bypass WAF: Stored XSS di Tengah Filter Keamanan Ketat</h3>
+            <p class="text-sm text-text-sub leading-relaxed">Teknik obfuscation kode JavaScript untuk mengelabui Web Application Firewall (WAF) modern.</p>
+          </div>
+        </article>
+
+        <!-- Artikel 7 -->
+        <article class="group border border-border-sub rounded-sm overflow-hidden hover:border-white/30 transition-all duration-300 bg-panel/50">
+          <div class="relative overflow-hidden aspect-video">
+            <img src="https://picsum.photos/seed/phishing-social-eng/800/450.jpg" alt="Phishing" class="object-cover w-full h-full opacity-80 group-hover:scale-105 group-hover:opacity-100 transition-all duration-500">
+            <div class="absolute top-4 left-4 px-2 py-1 bg-yellow-500/20 border border-yellow-500/30 rounded-sm">
+              <span class="text-[10px] font-mono font-bold tracking-widest text-yellow-400 uppercase">Social Eng</span>
+            </div>
+          </div>
+          <div class="p-6">
+            <div class="flex items-center gap-3 text-xs text-text-dim mb-3 font-mono">
+              <span>2024.08.20</span><span>•</span><span>SOCIAL</span>
+            </div>
+            <h3 class="text-xl font-medium tracking-tight mb-2 group-hover:text-accent-light transition-colors">Analisis Kampanye Phishing yang Menyasar UMKM</h3>
+            <p class="text-sm text-text-sub leading-relaxed">Membongkar modus operandi pelaku social engineering dan cara memverifikasi keaslian sebuah email.</p>
+          </div>
+        </article>
+
+        <!-- Artikel 8 -->
+        <article class="group border border-border-sub rounded-sm overflow-hidden hover:border-white/30 transition-all duration-300 bg-panel/50">
+          <div class="relative overflow-hidden aspect-video">
+            <img src="https://picsum.photos/seed/metasploit-exploit/800/450.jpg" alt="Metasploit" class="object-cover w-full h-full opacity-80 group-hover:scale-105 group-hover:opacity-100 transition-all duration-500">
+            <div class="absolute top-4 left-4 px-2 py-1 bg-purple-500/20 border border-purple-500/30 rounded-sm">
+              <span class="text-[10px] font-mono font-bold tracking-widest text-purple-400 uppercase">Exploit</span>
+            </div>
+          </div>
+          <div class="p-6">
+            <div class="flex items-center gap-3 text-xs text-text-dim mb-3 font-mono">
+              <span>2024.08.10</span><span>•</span><span>POST-EXPLOIT</span>
+            </div>
+            <h3 class="text-xl font-medium tracking-tight mb-2 group-hover:text-accent-light transition-colors">Post-Exploitation: Mempertahankan Akses (Persistence)</h3>
+            <p class="text-sm text-text-sub leading-relaxed">Teknik membuat backdoor tersembunyi menggunakan Registry, Scheduled Tasks, dan Rootkit dasar.</p>
+          </div>
+        </article>
+
+        <!-- Artikel 9 -->
+        <article class="group border border-border-sub rounded-sm overflow-hidden hover:border-white/30 transition-all duration-300 bg-panel/50">
+          <div class="relative overflow-hidden aspect-video">
+            <img src="https://picsum.photos/seed/api-security-rest/800/450.jpg" alt="API Security" class="object-cover w-full h-full opacity-80 group-hover:scale-105 group-hover:opacity-100 transition-all duration-500">
+            <div class="absolute top-4 left-4 px-2 py-1 bg-blue-500/20 border border-blue-500/30 rounded-sm">
+              <span class="text-[10px] font-mono font-bold tracking-widest text-blue-400 uppercase">API</span>
+            </div>
+          </div>
+          <div class="p-6">
+            <div class="flex items-center gap-3 text-xs text-text-dim mb-3 font-mono">
+              <span>2024.07.28</span><span>•</span><span>WEB APP</span>
+            </div>
+            <h3 class="text-xl font-medium tracking-tight mb-2 group-hover:text-accent-light transition-colors">API Hacking: IDOR (Insecure Direct Object Reference)</h3>
+            <p class="text-sm text-text-sub leading-relaxed">Cara sederhana namun fatal mengubah parameter ID untuk mengakses data akun orang lain di REST API.</p>
+          </div>
+        </article>
+
+        <!-- Artikel 10 -->
+        <article class="group border border-border-sub rounded-sm overflow-hidden hover:border-white/30 transition-all duration-300 bg-panel/50">
+          <div class="relative overflow-hidden aspect-video">
+            <img src="https://picsum.photos/seed/password-hash-crack/800/450.jpg" alt="Password Cracking" class="object-cover w-full h-full opacity-80 group-hover:scale-105 group-hover:opacity-100 transition-all duration-500">
+            <div class="absolute top-4 left-4 px-2 py-1 bg-green-500/20 border border-green-500/30 rounded-sm">
+              <span class="text-[10px] font-mono font-bold tracking-widest text-green-400 uppercase">Cryptography</span>
+            </div>
+          </div>
+          <div class="p-6">
+            <div class="flex items-center gap-3 text-xs text-text-dim mb-3 font-mono">
+              <span>2024.07.15</span><span>•</span><span>AUTH</span>
+            </div>
+            <h3 class="text-xl font-medium tracking-tight mb-2 group-hover:text-accent-light transition-colors">Mengapa MD5 & SHA1 Sudah Mati? (Password Hashing)</h3>
+            <p class="text-sm text-text-sub leading-relaxed">Studi kasus cracking hash menggunakan Hashcat dan mengapa industri beralih ke Bcrypt/Argon2.</p>
+          </div>
+        </article>
+
+        <!-- Artikel 11 -->
+        <article class="group border border-border-sub rounded-sm overflow-hidden hover:border-white/30 transition-all duration-300 bg-panel/50">
+          <div class="relative overflow-hidden aspect-video">
+            <img src="https://picsum.photos/seed/active-directory-pentest/800/450.jpg" alt="Active Directory" class="object-cover w-full h-full opacity-80 group-hover:scale-105 group-hover:opacity-100 transition-all duration-500">
+            <div class="absolute top-4 left-4 px-2 py-1 bg-red-500/20 border border-red-500/30 rounded-sm">
+              <span class="text-[10px] font-mono font-bold tracking-widest text-red-400 uppercase">AD</span>
+            </div>
+          </div>
+          <div class="p-6">
+            <div class="flex items-center gap-3 text-xs text-text-dim mb-3 font-mono">
+              <span>2024.07.01</span><span>•</span><span>ENTERPRISE</span>
+            </div>
+            <h3 class="text-xl font-medium tracking-tight mb-2 group-hover:text-accent-light transition-colors">Kerajaan Active Directory: Kerberoasting & AS-REP Roasting</h3>
+            <p class="text-sm text-text-sub leading-relaxed">Mengeksploitasi service principal names (SPN) untuk mencuri credential di lingkungan Windows Server.</p>
+          </div>
+        </article>
+
+        <!-- Artikel 12 -->
+        <article class="group border border-border-sub rounded-sm overflow-hidden hover:border-white/30 transition-all duration-300 bg-panel/50">
+          <div class="relative overflow-hidden aspect-video">
+            <img src="https://picsum.photos/seed/wifi-hacking-evil/800/450.jpg" alt="WiFi Hacking" class="object-cover w-full h-full opacity-80 group-hover:scale-105 group-hover:opacity-100 transition-all duration-500">
+            <div class="absolute top-4 left-4 px-2 py-1 bg-blue-500/20 border border-blue-500/30 rounded-sm">
+              <span class="text-[10px] font-mono font-bold tracking-widest text-blue-400 uppercase">Wireless</span>
+            </div>
+          </div>
+          <div class="p-6">
+            <div class="flex items-center gap-3 text-xs text-text-dim mb-3 font-mono">
+              <span>2024.06.20</span><span>•</span><span>WIFI</span>
+            </div>
+            <h3 class="text-xl font-medium tracking-tight mb-2 group-hover:text-accent-light transition-colors">Membuat Evil Twin Access Point untuk Captive Portal Phishing</h3>
+            <p class="text-sm text-text-sub leading-relaxed">Bagaimana meniru jaringan WiFi asli dan menampilkan portal login palsu untuk mencuri password.</p>
+          </div>
+        </article>
+
+        <!-- Artikel 13 -->
+        <article class="group border border-border-sub rounded-sm overflow-hidden hover:border-white/30 transition-all duration-300 bg-panel/50">
+          <div class="relative overflow-hidden aspect-video">
+            <img src="https://picsum.photos/seed/ssrf-server-request/800/450.jpg" alt="SSRF" class="object-cover w-full h-full opacity-80 group-hover:scale-105 group-hover:opacity-100 transition-all duration-500">
+            <div class="absolute top-4 left-4 px-2 py-1 bg-yellow-500/20 border border-yellow-500/30 rounded-sm">
+              <span class="text-[10px] font-mono font-bold tracking-widest text-yellow-400 uppercase">Advanced</span>
+            </div>
+          </div>
+          <div class="p-6">
+            <div class="flex items-center gap-3 text-xs text-text-dim mb-3 font-mono">
+              <span>2024.06.10</span><span>•</span><span>WEB APP</span>
+            </div>
+            <h3 class="text-xl font-medium tracking-tight mb-2 group-hover:text-accent-light transition-colors">SSRF (Server-Side Request Forgery) ke Internal Network</h3>
+            <p class="text-sm text-text-sub leading-relaxed">Memanipulasi server untuk melakukan request ke arah internal (localhost/cloud metadata) yang seharusnya tersembunyi.</p>
+          </div>
+        </article>
+
+        <!-- Artikel 14 -->
+        <article class="group border border-border-sub rounded-sm overflow-hidden hover:border-white/30 transition-all duration-300 bg-panel/50">
+          <div class="relative overflow-hidden aspect-video">
+            <img src="https://picsum.photos/seed/cloud-aws-s3-bucket/800/450.jpg" alt="Cloud Security" class="object-cover w-full h-full opacity-80 group-hover:scale-105 group-hover:opacity-100 transition-all duration-500">
+            <div class="absolute top-4 left-4 px-2 py-1 bg-green-500/20 border border-green-500/30 rounded-sm">
+              <span class="text-[10px] font-mono font-bold tracking-widest text-green-400 uppercase">Cloud</span>
+            </div>
+          </div>
+          <div class="p-6">
+            <div class="flex items-center gap-3 text-xs text-text-dim mb-3 font-mono">
+              <span>2024.05.25</span><span>•</span><span>AWS</span>
+            </div>
+            <h3 class="text-xl font-medium tracking-tight mb-2 group-hover:text-accent-light transition-colors">S3 Bucket Misconfiguration: Scanning & Data Extraction</h3>
+            <p class="text-sm text-text-sub leading-relaxed">Cara menemukan bucket AWS yang salah konfigurasi dan mengunduh ribuan data sensitif secara legal.</p>
+          </div>
+        </article>
+
+        <!-- Artikel 15 -->
+        <article class="group border border-border-sub rounded-sm overflow-hidden hover:border-white/30 transition-all duration-300 bg-panel/50">
+          <div class="relative overflow-hidden aspect-video">
+            <img src="https://picsum.photos/seed/android-apk-reverse/800/450.jpg" alt="Android" class="object-cover w-full h-full opacity-80 group-hover:scale-105 group-hover:opacity-100 transition-all duration-500">
+            <div class="absolute top-4 left-4 px-2 py-1 bg-purple-500/20 border border-purple-500/30 rounded-sm">
+              <span class="text-[10px] font-mono font-bold tracking-widest text-purple-400 uppercase">Mobile</span>
+            </div>
+          </div>
+          <div class="p-6">
+            <div class="flex items-center gap-3 text-xs text-text-dim mb-3 font-mono">
+              <span>2024.05.12</span><span>•</span><span>ANDROID</span>
+            </div>
+            <h3 class="text-xl font-medium tracking-tight mb-2 group-hover:text-accent-light transition-colors">Reverse Engineering APK: Bypass SSL Pinning</h3>
+            <p class="text-sm text-text-sub leading-relaxed">Menggunakan Frida untuk hooking aplikasi Android dan menonaktifkan keamanan SSL Pinning.</p>
+          </div>
+        </article>
+
+        <!-- Artikel 16 -->
+        <article class="group border border-border-sub rounded-sm overflow-hidden hover:border-white/30 transition-all duration-300 bg-panel/50">
+          <div class="relative overflow-hidden aspect-video">
+            <img src="https://picsum.photos/seed/red-team-c2-cobalt/800/450.jpg" alt="Red Team" class="object-cover w-full h-full opacity-80 group-hover:scale-105 group-hover:opacity-100 transition-all duration-500">
+            <div class="absolute top-4 left-4 px-2 py-1 bg-red-500/20 border border-red-500/30 rounded-sm">
+              <span class="text-[10px] font-mono font-bold tracking-widest text-red-400 uppercase">Red Team</span>
+            </div>
+          </div>
+          <div class="p-6">
+            <div class="flex items-center gap-3 text-xs text-text-dim mb-3 font-mono">
+              <span>2024.04.30</span><span>•</span><span>C2</span>
+            </div>
+            <h3 class="text-xl font-medium tracking-tight mb-2 group-hover:text-accent-light transition-colors">Membangun Infrastruktur Command & Control (C2) Undetected</h3>
+            <p class="text-sm text-text-sub leading-relaxed">Teknik membuat C2 server menggunakan domain forwarding dan CDN agar lolos dari sistem IDS/IPS.</p>
+          </div>
+        </article>
+
+        <!-- Artikel 17 -->
+        <article class="group border border-border-sub rounded-sm overflow-hidden hover:border-white/30 transition-all duration-300 bg-panel/50">
+          <div class="relative overflow-hidden aspect-video">
+            <img src="https://picsum.photos/seed/osint-footprinting/800/450.jpg" alt="OSINT" class="object-cover w-full h-full opacity-80 group-hover:scale-105 group-hover:opacity-100 transition-all duration-500">
+            <div class="absolute top-4 left-4 px-2 py-1 bg-blue-500/20 border border-blue-500/30 rounded-sm">
+              <span class="text-[10px] font-mono font-bold tracking-widest text-blue-400 uppercase">OSINT</span>
+            </div>
+          </div>
+          <div class="p-6">
+            <div class="flex items-center gap-3 text-xs text-text-dim mb-3 font-mono">
+              <span>2024.04.15</span><span>•</span><span>INTEL</span>
+            </div>
+            <h3 class="text-xl font-medium tracking-tight mb-2 group-hover:text-accent-light transition-colors">OSINT: Melacak Identitas Digital Sasaran Hingga Titik Lokasi</h3>
+            <p class="text-sm text-text-sub leading-relaxed">Mengumpulkan informasi dari open source (media sosial, WHOIS, Shodan) untuk membuat profil lengkap target.</p>
+          </div>
+        </article>
+
+        <!-- Artikel 18 -->
+        <article class="group border border-border-sub rounded-sm overflow-hidden hover:border-white/30 transition-all duration-300 bg-panel/50">
+          <div class="relative overflow-hidden aspect-video">
+            <img src="https://picsum.photos/seed/file-upload-bypass/800/450.jpg" alt="File Upload" class="object-cover w-full h-full opacity-80 group-hover:scale-105 group-hover:opacity-100 transition-all duration-500">
+            <div class="absolute top-4 left-4 px-2 py-1 bg-yellow-500/20 border border-yellow-500/30 rounded-sm">
+              <span class="text-[10px] font-mono font-bold tracking-widest text-yellow-400 uppercase">Bypass</span>
+            </div>
+          </div>
+          <div class="p-6">
+            <div class="flex items-center gap-3 text-xs text-text-dim mb-3 font-mono">
+              <span>2024.04.01</span><span>•</span><span>WEB APP</span>
+            </div>
+            <h3 class="text-xl font-medium tracking-tight mb-2 group-hover:text-accent-light transition-colors">Webshell Upload: Membypass Filter Ekstensi & Magic Bytes</h3>
+            <p class="text-sm text-text-sub leading-relaxed">Menggunakan double extension, null bytes, dan manipulasi header file untuk mengupload backdoor PHP.</p>
+          </div>
+        </article>
+
+        <!-- Artikel 19 -->
+        <article class="group border border-border-sub rounded-sm overflow-hidden hover:border-white/30 transition-all duration-300 bg-panel/50">
+          <div class="relative overflow-hidden aspect-video">
+            <img src="https://picsum.photos/seed/dns-poisoning-cache/800/450.jpg" alt="DNS" class="object-cover w-full h-full opacity-80 group-hover:scale-105 group-hover:opacity-100 transition-all duration-500">
+            <div class="absolute top-4 left-4 px-2 py-1 bg-purple-500/20 border border-purple-500/30 rounded-sm">
+              <span class="text-[10px] font-mono font-bold tracking-widest text-purple-400 uppercase">Network</span>
+            </div>
+          </div>
+          <div class="p-6">
+            <div class="flex items-center gap-3 text-xs text-text-dim mb-3 font-mono">
+              <span>2024.03.18</span><span>•</span><span>DNS</span>
+            </div>
+            <h3 class="text-xl font-medium tracking-tight mb-2 group-hover:text-accent-light transition-colors">DNS Spoofing & Cache Poisoning pada Jaringan Lokal</h3>
+            <p class="text-sm text-text-sub leading-relaxed">Membelokkan permintaan DNS agar korban yang mengetik Google.com diarahkan ke IP milik attacker.</p>
+          </div>
+        </article>
+
+        <!-- Artikel 20 -->
+        <article class="group border border-border-sub rounded-sm overflow-hidden hover:border-white/30 transition-all duration-300 bg-panel/50">
+          <div class="relative overflow-hidden aspect-video">
+            <img src="https://picsum.photos/seed/lock-picking-physical/800/450.jpg" alt="Physical" class="object-cover w-full h-full opacity-80 group-hover:scale-105 group-hover:opacity-100 transition-all duration-500">
+            <div class="absolute top-4 left-4 px-2 py-1 bg-green-500/20 border border-green-500/30 rounded-sm">
+              <span class="text-[10px] font-mono font-bold tracking-widest text-green-400 uppercase">Physical</span>
+            </div>
+          </div>
+          <div class="p-6">
+            <div class="flex items-center gap-3 text-xs text-text-dim mb-3 font-mono">
+              <span>2024.03.05</span><span>•</span><span>PHYSICAL</span>
+            </div>
+            <h3 class="text-xl font-medium tracking-tight mb-2 group-hover:text-accent-light transition-colors">Tailgating & USB Drop: Serangan Fisik yang Masih Ampuh</h3>
+            <p class="text-sm text-text-sub leading-relaxed">Menggunakan Rubber Ducky untuk menginstal payload dalam hitungan detik saat berhasil masuk ke ruang server.</p>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact" class="px-6 md:px-12 py-24 border-t border-border-sub">
+    <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16">
+      
+      <!-- Contact Info -->
+      <div>
+        <p class="text-xs font-medium tracking-widest uppercase text-text-dim mb-2">// Get in Touch</p>
+        <h2 class="text-3xl md:text-4xl font-medium tracking-tight mb-6">Kontak</h2>
+        <p class="text-base text-text-sub leading-relaxed mb-8">
+          Tertarik untuk berdiskusi tentang keamanan siber, kolaborasi bug bounty, atau ingin bertanya seputar teknik di blog ini? Hubungi saya melalui platform di bawah ini.
+        </p>
+
+        <div class="space-y-6">
+          <a href="https://instagram.com/kenzodistaananta" target="_blank" class="flex items-center gap-4 group">
+            <div class="w-12 h-12 border border-border-sub rounded-sm flex items-center justify-center group-hover:border-pink-500/50 transition-colors">
+              <i data-lucide="instagram" class="w-5 h-5 text-text-sub group-hover:text-pink-400 transition-colors"></i>
+            </div>
+            <div>
+              <p class="text-sm text-text-dim uppercase tracking-wider">Personal IG</p>
+              <p class="text-lg font-medium group-hover:text-pink-400 transition-colors">@kenzodistaananta</p>
+            </div>
+          </a>
+
+          <a href="https://instagram.com/v1pediastore" target="_blank" class="flex items-center gap-4 group">
+            <div class="w-12 h-12 border border-border-sub rounded-sm flex items-center justify-center group-hover:border-blue-500/50 transition-colors">
+              <i data-lucide="store" class="w-5 h-5 text-text-sub group-hover:text-blue-400 transition-colors"></i>
+            </div>
+            <div>
+              <p class="text-sm text-text-dim uppercase tracking-wider">Business IG</p>
+              <p class="text-lg font-medium group-hover:text-blue-400 transition-colors">@v1pediastore</p>
+            </div>
+          </a>
+
+          <a href="mailto:kenzo@blackhat.dev" class="flex items-center gap-4 group">
+            <div class="w-12 h-12 border border-border-sub rounded-sm flex items-center justify-center group-hover:border-white/30 transition-colors">
+              <i data-lucide="mail" class="w-5 h-5 text-text-sub group-hover:text-white transition-colors"></i>
+            </div>
+            <div>
+              <p class="text-sm text-text-dim uppercase tracking-wider">Email</p>
+              <p class="text-lg font-medium group-hover:text-white transition-colors">kenzo@blackhat.dev</p>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Contact Form -->
+      <div class="border border-border-sub rounded-sm bg-panel/50 p-8">
+        <h3 class="text-xl font-medium tracking-tight mb-6">Kirim Pesan Rahasia</h3>
+        <form id="contact-form" class="space-y-4">
+          <div>
+            <label class="text-xs font-medium tracking-widest uppercase text-text-dim mb-2 block">Nama / Alias</label>
+            <input type="text" required class="w-full bg-primary border border-border-sub p-3 rounded-sm text-sm text-white focus:border-accent transition-colors" placeholder="Anonymous">
+          </div>
+          <div>
+            <label class="text-xs font-medium tracking-widest uppercase text-text-dim mb-2 block">Email</label>
+            <input type="email" required class="w-full bg-primary border border-border-sub p-3 rounded-sm text-sm text-white focus:border-accent transition-colors" placeholder="email@secure.com">
+          </div>
+          <div>
+            <label class="text-xs font-medium tracking-widest uppercase text-text-dim mb-2 block">Pesan Terenkripsi</label>
+            <textarea rows="5" required class="w-full bg-primary border border-border-sub p-3 rounded-sm text-sm text-white focus:border-accent transition-colors resize-none" placeholder="Tulis pesan anda di sini..."></textarea>
+          </div>
+          <button type="submit" class="w-full px-6 py-3 bg-white text-black text-xs font-bold uppercase tracking-widest rounded-sm hover:bg-neutral-200 transition-colors flex items-center justify-center gap-2">
+            <i data-lucide="send" class="w-4 h-4"></i>
+            Kirim Pesan
+          </button>
+          <div id="form-status" class="text-sm font-mono text-center hidden"></div>
+        </form>
       </div>
     </div>
   </section>
 
   <!-- Footer -->
-  <footer class="px-6 md:px-12 py-12 border-t border-border-sub">
-    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-      <p class="text-sm text-text-dim font-mono">&copy; 2024 Kenzo. All rights reserved.</p>
-      <div class="flex items-center gap-6">
-        <a href="#" class="text-text-dim hover:text-white transition-colors"><i data-lucide="github" class="w-5 h-5"></i></a>
-        <a href="#" class="text-text-dim hover:text-white transition-colors"><i data-lucide="twitter" class="w-5 h-5"></i></a>
-        <a href="#" class="text-text-dim hover:text-white transition-colors"><i data-lucide="mail" class="w-5 h-5"></i></a>
+  <footer class="px-6 md:px-12 py-12 border-t border-border-sub bg-panel/30">
+    <div class="max-w-7xl mx-auto">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+        <!-- Brand -->
+        <div>
+          <a href="#" class="text-xl font-bold tracking-tighter uppercase glitch-hover">
+            BLACK<span class="text-accent">HAT</span>
+          </a>
+          <p class="text-sm text-text-dim mt-3 leading-relaxed">Mendidik dan melindungi dunia digital melalui pemahaman serangan.</p>
+        </div>
+        <!-- Links -->
+        <div>
+          <p class="text-xs font-medium tracking-widest uppercase text-text-dim mb-4">Navigasi</p>
+          <div class="space-y-2">
+            <a href="#about" class="block text-sm text-text-sub hover:text-white transition-colors">Tentang Kenzo</a>
+            <a href="#articles" class="block text-sm text-text-sub hover:text-white transition-colors">Artikel Teknikal</a>
+            <a href="#tools" class="block text-sm text-text-sub hover:text-white transition-colors">Arsenal Tools</a>
+            <a href="#contact" class="block text-sm text-text-sub hover:text-white transition-colors">Hubungi Saya</a>
+          </div>
+        </div>
+        <!-- Legal -->
+        <div>
+          <p class="text-xs font-medium tracking-widest uppercase text-text-dim mb-4">Legal & Etika</p>
+          <div class="space-y-2">
+            <p class="text-sm text-text-sub">© 2024 Kenzo Dista Ananta.</p>
+            <p class="text-sm text-text-sub">All Rights Reserved.</p>
+            <p class="text-xs text-red-400/70 font-mono mt-4">Segala konten disediakan semata-mata untuk tujuan edukasi keamanan siber. Dilarang keras menyalahgunakan informasi yang diberikan.</p>
+          </div>
+        </div>
       </div>
-      <p class="text-xs text-text-dim">Educational Purposes Only</p>
+      
+      <div class="border-t border-border-sub pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+        <p class="text-xs text-text-dim font-mono">Designed & Coded by Kenzo Dista Ananta</p>
+        <div class="flex items-center gap-6">
+          <a href="https://instagram.com/kenzodistaananta" target="_blank" class="text-text-dim hover:text-pink-400 transition-colors"><i data-lucide="instagram" class="w-5 h-5"></i></a>
+          <a href="https://instagram.com/v1pediastore" target="_blank" class="text-text-dim hover:text-blue-400 transition-colors"><i data-lucide="store" class="w-5 h-5"></i></a>
+          <a href="mailto:kenzo@blackhat.dev" class="text-text-dim hover:text-white transition-colors"><i data-lucide="mail" class="w-5 h-5"></i></a>
+        </div>
+      </div>
     </div>
   </footer>
 
   <!-- Scripts -->
   <script>
-    // Inisialisasi Lucide Icons
+    // Init Icons
     lucide.createIcons();
 
-    // Toggle Mobile Menu
+    // Mobile Menu Toggle
     const menuToggle = document.getElementById('menu-toggle');
     const mobileMenu = document.getElementById('mobile-menu');
     
@@ -253,11 +715,48 @@
       mobileMenu.classList.toggle('hidden');
     });
 
-    // Klik link di mobile menu untuk menutup menu
-    mobileMenu.querySelectorAll('a').forEach(link => {
+    document.querySelectorAll('.mobile-link').forEach(link => {
       link.addEventListener('click', () => {
         mobileMenu.classList.add('hidden');
       });
+    });
+
+    // Easter Egg Secret Panel
+    const secretTrigger = document.getElementById('secret-trigger');
+    const secretPanel = document.getElementById('secret-panel');
+    secretTrigger.addEventListener('click', () => {
+      secretPanel.classList.toggle('hidden');
+    });
+
+    // Contact Form Handler (Frontend Only Simulation)
+    const contactForm = document.getElementById('contact-form');
+    const formStatus = document.getElementById('form-status');
+    
+    contactForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const btn = this.querySelector('button[type="submit"]');
+      btn.innerHTML = '<span class="animate-pulse">Mengenkripsi...</span>';
+      btn.disabled = true;
+
+      setTimeout(() => {
+        formStatus.classList.remove('hidden');
+        formStatus.classList.add('text-green-400');
+        formStatus.textContent = '> Pesan berhasil dikirim. Terima kasih.';
+        btn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i> Terkirim';
+        btn.classList.remove('bg-white', 'text-black', 'hover:bg-neutral-200');
+        btn.classList.add('bg-green-500/20', 'text-green-400', 'border', 'border-green-500/30');
+        lucide.createIcons();
+        
+        setTimeout(() => {
+          contactForm.reset();
+          btn.innerHTML = '<i data-lucide="send" class="w-4 h-4"></i> Kirim Pesan';
+          btn.disabled = false;
+          btn.classList.add('bg-white', 'text-black', 'hover:bg-neutral-200');
+          btn.classList.remove('bg-green-500/20', 'text-green-400', 'border', 'border-green-500/30');
+          formStatus.classList.add('hidden');
+          lucide.createIcons();
+        }, 3000);
+      }, 1500);
     });
   </script>
 </body>
