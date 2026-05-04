@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BLACK HAT // Kenzo's Security Blog</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#050505',
+            panel: '#0A0A0A',
+            accent: '#3b82f6',
+            'accent-light': '#60a5fa',
+            'text-main': '#FFFFFF',
+            'text-sub': '#A1A1AA',
+            'text-dim': '#52525B',
+            'border-sub': '#3f3f46',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    * { font-family: 'Inter', sans-serif; }
+    body { background: #050505; }
+
+    /* PERBAIKAN: Menyelesaikan animasi grainNoise */
+    @keyframes grainNoise {
+      0% { transform: translate(0, 0); }
+      10% { transform: translate(-5%, -5%); }
+      20% { transform: translate(10%, 5%); }
+      30% { transform: translate(-5%, 10%); }
+      40% { transform: translate(5%, -5%); }
+      50% { transform: translate(-10%, 5%); }
+      60% { transform: translate(10%, -10%); }
+      70% { transform: translate(-5%, 10%); }
+      80% { transform: translate(5%, 5%); }
+      90% { transform: translate(-10%, -5%); }
+      100% { transform: translate(5%, 0); }
+    }
+
+    /* TAMBAHAN: Efek Glitch untuk Heading */
+    @keyframes glitch {
+      0% { transform: translate(0) }
+      20% { transform: translate(-2px, 2px) }
+      40% { transform: translate(-2px, -2px) }
+      60% { transform: translate(2px, 2px) }
+      80% { transform: translate(2px, -2px) }
+      100% { transform: translate(0) }
+    }
+
+    .glitch-hover:hover {
+      animation: glitch 0.3s cubic-bezier(.25,.46,.45,.94) infinite;
+    }
+
+    /* TAMBAHAN: Scanline retro */
+    .scanline::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.25) 50%), linear-gradient(90deg, rgba(255,0,0,0.06), rgba(0,255,0,0.02), rgba(0,0,255,0.06));
+      background-size: 100% 2px, 3px 100%;
+      opacity: 0.2;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #050505; }
+    ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 3px; }
+  </style>
+</head>
+<body class="text-text-main min-h-screen relative overflow-x-hidden">
+
+  <!-- Background Grain Noise -->
+  <div class="fixed inset-0 z-50 pointer-events-none opacity-20" style="background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 256 256%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noise%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noise)%22/%3E%3C/svg%3E'); animation: grainNoise 0.2s steps(1) infinite;"></div>
+
+  <!-- Background Gradients -->
+  <div class="fixed top-0 left-0 w-96 h-96 bg-blue-600/10 rounded-full blur-[120px] animate-pulse"></div>
+  <div class="fixed bottom-0 right-0 w-96 h-96 bg-purple-600/5 rounded-full blur-[120px] animate-pulse" style="animation-delay: 1s;"></div>
+
+  <!-- Navigation -->
+  <nav class="fixed top-0 left-0 right-0 z-40 px-6 py-6 flex justify-between items-center mix-blend-difference">
+    <a href="#" class="text-xl font-bold tracking-tighter uppercase glitch-hover">
+      BLACK<span class="text-accent">HAT</span>
+    </a>
+    <div class="hidden md:flex items-center gap-8">
+      <a href="#" class="text-sm font-medium text-text-sub hover:text-white transition-colors duration-150 tracking-wide uppercase">Blog</a>
+      <a href="#" class="text-sm font-medium text-text-sub hover:text-white transition-colors duration-150 tracking-wide uppercase">Tools</a>
+      <a href="#" class="text-sm font-medium text-text-sub hover:text-white transition-colors duration-150 tracking-wide uppercase">About</a>
+      <button class="px-4 py-2 bg-white text-black text-xs font-bold uppercase tracking-widest rounded-sm hover:bg-neutral-200 transition-colors">
+        Login
+      </button>
+    </div>
+    <button class="md:hidden text-white" id="menu-toggle">
+      <i data-lucide="menu" class="w-6 h-6"></i>
+    </button>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div id="mobile-menu" class="fixed inset-0 bg-primary z-30 flex flex-col items-center justify-center gap-8 hidden">
+    <a href="#" class="text-2xl font-medium tracking-tight text-text-sub hover:text-white transition-colors">Blog</a>
+    <a href="#" class="text-2xl font-medium tracking-tight text-text-sub hover:text-white transition-colors">Tools</a>
+    <a href="#" class="text-2xl font-medium tracking-tight text-text-sub hover:text-white transition-colors">About</a>
+  </div>
+
+  <!-- Hero Section -->
+  <section class="min-h-screen flex flex-col justify-end px-6 md:px-12 pb-16 pt-32 relative scanline">
+    <div class="max-w-7xl mx-auto w-full">
+      <p class="text-xs font-medium tracking-widest uppercase text-text-dim mb-4">// System Initiated</p>
+      <h1 class="text-5xl md:text-8xl font-medium tracking-tighter leading-none mb-6 glitch-hover">
+        KENZO<br>
+        <span class="text-text-sub">SECURITY</span>
+      </h1>
+      <p class="text-base md:text-lg font-light leading-relaxed text-text-sub max-w-xl mb-8">
+        Mendalami celah keamanan sistem, rekayasa balik, dan analisis ancaman siber. Catatan pribadi dari balik layar dunia cyber security.
+      </p>
+      <div class="flex items-center gap-4">
+        <a href="#articles" class="px-6 py-3 bg-white text-black text-xs font-bold uppercase tracking-widest rounded-sm hover:bg-neutral-200 transition-colors flex items-center gap-2">
+          Baca Artikel
+          <i data-lucide="arrow-down" class="w-4 h-4"></i>
+        </a>
+        <div class="w-2 h-2 bg-green-500 rounded-full animate-ping"></div>
+        <span class="text-xs font-mono text-green-500">ONLINE</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Articles Section -->
+  <section id="articles" class="px-6 md:px-12 py-24">
+    <div class="max-w-7xl mx-auto">
+      <div class="flex justify-between items-end mb-12 border-b border-border-sub pb-4">
+        <div>
+          <p class="text-xs font-medium tracking-widest uppercase text-text-dim mb-2">// Recent Logs</p>
+          <h2 class="text-3xl md:text-4xl font-medium tracking-tight">Artikel Terbaru</h2>
+        </div>
+        <a href="#" class="text-sm text-text-sub hover:text-white transition-colors flex items-center gap-1">
+          Semua Artikel <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </a>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Card 1 -->
+        <article class="group border border-border-sub rounded-sm overflow-hidden hover:border-white/30 transition-all duration-300 bg-panel/50">
+          <div class="relative overflow-hidden aspect-video">
+            <img src="https://picsum.photos/seed/hacking-terminal/800/450.jpg" alt="SQL Injection" class="object-cover w-full h-full opacity-80 group-hover:scale-105 group-hover:opacity-100 transition-all duration-500">
+            <div class="absolute top-4 left-4 px-2 py-1 bg-red-500/20 border border-red-500/30 rounded-sm">
+              <span class="text-[10px] font-mono font-bold tracking-widest text-red-400 uppercase">Critical</span>
+            </div>
+          </div>
+          <div class="p-6">
+            <div class="flex items-center gap-3 text-xs text-text-dim mb-3 font-mono">
+              <span>2024.10.24</span>
+              <span>•</span>
+              <span>WEB APP</span>
+            </div>
+            <h3 class="text-xl font-medium tracking-tight mb-2 group-hover:text-accent-light transition-colors">Analisis Depth: SQL Injection pada Framework Modern</h3>
+            <p class="text-sm text-text-sub leading-relaxed">Bagaimana ORM bisa bypass dan teknik kedua untuk mengeksploitasi celah pada sistem yang dianggap aman.</p>
+          </div>
+        </article>
+
+        <!-- Card 2 -->
+        <article class="group border border-border-sub rounded-sm overflow-hidden hover:border-white/30 transition-all duration-300 bg-panel/50">
+          <div class="relative overflow-hidden aspect-video">
+            <img src="https://picsum.photos/seed/dark-network/800/450.jpg" alt="Network" class="object-cover w-full h-full opacity-80 group-hover:scale-105 group-hover:opacity-100 transition-all duration-500">
+            <div class="absolute top-4 left-4 px-2 py-1 bg-blue-500/20 border border-blue-500/30 rounded-sm">
+              <span class="text-[10px] font-mono font-bold tracking-widest text-blue-400 uppercase">Tutorial</span>
+            </div>
+          </div>
+          <div class="p-6">
+            <div class="flex items-center gap-3 text-xs text-text-dim mb-3 font-mono">
+              <span>2024.10.18</span>
+              <span>•</span>
+              <span>NETWORK</span>
+            </div>
+            <h3 class="text-xl font-medium tracking-tight mb-2 group-hover:text-accent-light transition-colors">Man in the Middle (MITM) Attack di Jaringan WiFi Publik</h3>
+            <p class="text-sm text-text-sub leading-relaxed">Studi kasus nyata dan demonstrasi bagaimana data bisa diintercept tanpa sepengetahuan korban.</p>
+          </div>
+        </article>
+
+        <!-- Card 3 -->
+        <article class="group border border-border-sub rounded-sm overflow-hidden hover:border-white/30 transition-all duration-300 bg-panel/50">
+          <div class="relative overflow-hidden aspect-video">
+            <img src="https://picsum.photos/seed/malware-code/800/450.jpg" alt="Malware" class="object-cover w-full h-full opacity-80 group-hover:scale-105 group-hover:opacity-100 transition-all duration-500">
+            <div class="absolute top-4 left-4 px-2 py-1 bg-yellow-500/20 border border-yellow-500/30 rounded-sm">
+              <span class="text-[10px] font-mono font-bold tracking-widest text-yellow-400 uppercase">Reverse Eng</span>
+            </div>
+          </div>
+          <div class="p-6">
+            <div class="flex items-center gap-3 text-xs text-text-dim mb-3 font-mono">
+              <span>2024.10.05</span>
+              <span>•</span>
+              <span>MALWARE</span>
+            </div>
+            <h3 class="text-xl font-medium tracking-tight mb-2 group-hover:text-accent-light transition-colors">Unpacking Malware .NET menggunakan dnSpy</h3>
+            <p class="text-sm text-text-sub leading-relaxed">Langkah demi langkah melakukan dekompilasi dan analisis logika malware berbasis .NET framework.</p>
+          </div>
+        </article>
+
+        <!-- Card 4 -->
+        <article class="group border border-border-sub rounded-sm overflow-hidden hover:border-white/30 transition-all duration-300 bg-panel/50">
+          <div class="relative overflow-hidden aspect-video">
+            <img src="https://picsum.photos/seed/linux-server/800/450.jpg" alt="Privilege Escalation" class="object-cover w-full h-full opacity-80 group-hover:scale-105 group-hover:opacity-100 transition-all duration-500">
+            <div class="absolute top-4 left-4 px-2 py-1 bg-purple-500/20 border border-purple-500/30 rounded-sm">
+              <span class="text-[10px] font-mono font-bold tracking-widest text-purple-400 uppercase">Linux</span>
+            </div>
+          </div>
+          <div class="p-6">
+            <div class="flex items-center gap-3 text-xs text-text-dim mb-3 font-mono">
+              <span>2024.09.28</span>
+              <span>•</span>
+              <span>PRIVESC</span>
+            </div>
+            <h3 class="text-xl font-medium tracking-tight mb-2 group-hover:text-accent-light transition-colors">Linux Privilege Escalation: SUID Binaries Exploit</h3>
+            <p class="text-sm text-text-sub leading-relaxed">Mengidentifikasi misconfiguration dan mengeksploitasi binary SUID untuk mendapatkan akses root.</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="px-6 md:px-12 py-12 border-t border-border-sub">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+      <p class="text-sm text-text-dim font-mono">&copy; 2024 Kenzo. All rights reserved.</p>
+      <div class="flex items-center gap-6">
+        <a href="#" class="text-text-dim hover:text-white transition-colors"><i data-lucide="github" class="w-5 h-5"></i></a>
+        <a href="#" class="text-text-dim hover:text-white transition-colors"><i data-lucide="twitter" class="w-5 h-5"></i></a>
+        <a href="#" class="text-text-dim hover:text-white transition-colors"><i data-lucide="mail" class="w-5 h-5"></i></a>
+      </div>
+      <p class="text-xs text-text-dim">Educational Purposes Only</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script>
+    // Inisialisasi Lucide Icons
+    lucide.createIcons();
+
+    // Toggle Mobile Menu
+    const menuToggle = document.getElementById('menu-toggle');
+    const mobileMenu = document.getElementById('mobile-menu');
+    
+    menuToggle.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
+    });
+
+    // Klik link di mobile menu untuk menutup menu
+    mobileMenu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        mobileMenu.classList.add('hidden');
+      });
+    });
+  </script>
+</body>
+</html>
